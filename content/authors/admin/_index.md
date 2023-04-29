@@ -49,21 +49,30 @@ education:
 #   For an email link, use "fas" icon pack, "envelope" icon, and a link in the
 #   form "mailto:your-email@example.com" or "/#contact" for contact widget.
 social:
-  - icon: envelope
+  - icon: feather-alt
     icon_pack: fas
-    link: '/#contact'
+    link: https://www.elibrary.ru/project_user_office.asp
   - icon: graduation-cap # Alternatively, use `google-scholar` icon from `ai` icon pack
     icon_pack: fas
     link: https://scholar.google.co.uk/citations?user=sIwtMXoAAAAJ
+  - icon: address-card
+    icon_pack: fas
+    link: https://orcid.org/0009-0006-9788-6400
+  - icon: brain
+    icon_pack: fas
+    link: https://www.mendeley.com/settings/account/
+  - icon: dice-d20
+    icon_pack: fas
+    link: https://www.mendeley.com/settings/account/
+  - icon: dice-d6
+    icon_pack: fas
+    link: https://independent.academia.edu/NadezhdaRogozhina
+  - icon: dizzy
+    icon_pack: far
+    link: https://arxiv.org/user/
   - icon: github
     icon_pack: fab
     link: https://github.com/MikoGreen
-  # Link to a PDF of your resume/CV.
-  # To use: copy your resume to `static/uploads/resume.pdf`, enable `ai` icons in `params.yaml`,
-  # and uncomment the lines below.
-  - icon: cv
-    icon_pack: ai
-    link: uploads/resume.pdf
 
 # Enter email to display Gravatar (if Gravatar enabled in Config)
 email: 'miko.green@yandex.ru'
