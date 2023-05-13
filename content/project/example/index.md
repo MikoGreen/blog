@@ -1,9 +1,9 @@
 ---
-title: Example Project
-summary: An example of using the in-built project page.
+title: Исследование по играм за 2016 год.
+summary: Выявление определяющих успешность игры закономерностей.
 tags:
   - Deep Learning
-date: '2016-04-27T00:00:00Z'
+date: '2023-05-13T00:00:00Z'
 
 # Optional external URL for project (replaces project detail page).
 external_link: ''
@@ -13,10 +13,10 @@ image:
   focal_point: Smart
 
 links:
-  - icon: twitter
+  - icon: github
     icon_pack: fab
     name: Follow
-    url: https://twitter.com/georgecushen
+    url: https://github.com/MikoGreen
 url_code: ''
 url_pdf: ''
 url_slides: ''
@@ -30,12 +30,185 @@ url_video: ''
 slides: example
 ---
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis posuere tellus ac convallis placerat. Proin tincidunt magna sed ex sollicitudin condimentum. Sed ac faucibus dolor, scelerisque sollicitudin nisi. Cras purus urna, suscipit quis sapien eu, pulvinar tempor diam. Quisque risus orci, mollis id ante sit amet, gravida egestas nisl. Sed ac tempus magna. Proin in dui enim. Donec condimentum, sem id dapibus fringilla, tellus enim condimentum arcu, nec volutpat est felis vel metus. Vestibulum sit amet erat at nulla eleifend gravida.
+# Сборный проект
 
-Nullam vel molestie justo. Curabitur vitae efficitur leo. In hac habitasse platea dictumst. Sed pulvinar mauris dui, eget varius purus congue ac. Nulla euismod, lorem vel elementum dapibus, nunc justo porta mi, sed tempus est est vel tellus. Nam et enim eleifend, laoreet sem sit amet, elementum sem. Morbi ut leo congue, maximus velit ut, finibus arcu. In et libero cursus, rutrum risus non, molestie leo. Nullam congue quam et volutpat malesuada. Sed risus tortor, pulvinar et dictum nec, sodales non mi. Phasellus lacinia commodo laoreet. Nam mollis, erat in feugiat consectetur, purus eros egestas tellus, in auctor urna odio at nibh. Mauris imperdiet nisi ac magna convallis, at rhoncus ligula cursus.
+Нам предоставлены данные за 2016 год интернет-магазина «Стримчик», который продаёт по всему миру компьютерные игры. Также в открытых источниках мы можем найти исторические данные о продажах игр, оценки пользователей и экспертов, жанры и платформы (например, Xbox или PlayStation).
 
-Cras aliquam rhoncus ipsum, in hendrerit nunc mattis vitae. Duis vitae efficitur metus, ac tempus leo. Cras nec fringilla lacus. Quisque sit amet risus at ipsum pharetra commodo. Sed aliquam mauris at consequat eleifend. Praesent porta, augue sed viverra bibendum, neque ante euismod ante, in vehicula justo lorem ac eros. Suspendisse augue libero, venenatis eget tincidunt ut, malesuada at lorem. Donec vitae bibendum arcu. Aenean maximus nulla non pretium iaculis. Quisque imperdiet, nulla in pulvinar aliquet, velit quam ultrices quam, sit amet fringilla leo sem vel nunc. Mauris in lacinia lacus.
+Задача - выявить определяющие успешность игры закономерности. Это позволит сделать ставку на потенциально популярный продукт и спланировать рекламные кампании.
 
-Suspendisse a tincidunt lacus. Curabitur at urna sagittis, dictum ante sit amet, euismod magna. Sed rutrum massa id tortor commodo, vitae elementum turpis tempus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean purus turpis, venenatis a ullamcorper nec, tincidunt et massa. Integer posuere quam rutrum arcu vehicula imperdiet. Mauris ullamcorper quam vitae purus congue, quis euismod magna eleifend. Vestibulum semper vel augue eget tincidunt. Fusce eget justo sodales, dapibus odio eu, ultrices lorem. Duis condimentum lorem id eros commodo, in facilisis mauris scelerisque. Morbi sed auctor leo. Nullam volutpat a lacus quis pharetra. Nulla congue rutrum magna a ornare.
+# Цель исследования
 
-Aliquam in turpis accumsan, malesuada nibh ut, hendrerit justo. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Quisque sed erat nec justo posuere suscipit. Donec ut efficitur arcu, in malesuada neque. Nunc dignissim nisl massa, id vulputate nunc pretium nec. Quisque eget urna in risus suscipit ultricies. Pellentesque odio odio, tincidunt in eleifend sed, posuere a diam. Nam gravida nisl convallis semper elementum. Morbi vitae felis faucibus, vulputate orci placerat, aliquet nisi. Aliquam erat volutpat. Maecenas sagittis pulvinar purus, sed porta quam laoreet at.
+  - оценить игры (топ 5) для разных континентов
+  - определить самые популярные игры на разных платформах
+  - выявить факторы, определяющие успешность игры
+
+# Ход исследования
+
+О качестве данных ничего не известно, поэтому первым этапом произведем первоначальную оценку данных, пропусков и дупликатов. После этого уже можно будет приступать к самому анализу данных.
+
+# Шаг 1. Откройте файл с данными и изучите общую информацию
+
+```
+import pandas as pd
+pd.set_option('display.max_columns', None)
+from scipy import stats as st
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
+import matplotlib.ticker as ticker
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from skimpy import skim
+import plotly.express as px
+```
+```
+try:
+    data = pd.read_csv('C:/Users/Home/Documents/Яндекс/Сатанист/games.csv')
+except:
+    data = pd.read_csv('/datasets/games.csv')
+```
+
+В таблице у нас представлены 11 колонок:
+
+  - Name — название игры
+  - Platform — платформа
+  - Year_of_Release — год выпуска
+  - Genre — жанр игры
+  - NA_sales — продажи в Северной Америке (миллионы проданных копий)
+  - EU_sales — продажи в Европе (миллионы проданных копий)
+  - JP_sales — продажи в Японии (миллионы проданных копий)
+  - Other_sales — продажи в других странах (миллионы проданных копий)
+  - Critic_Score — оценка критиков (максимум 100)
+  - User_Score — оценка пользователей (максимум 10)
+  - Rating — рейтинг от организации ESRB (англ. Entertainment Software Rating Board). Эта ассоциация определяет рейтинг компьютерных игр и присваивает им подходящую возрастную категорию.
+
+## Промежуточный вывод:
+
+После предобработки данных, мы избавились от пропусков непонятного характера (пропуски в столбце name), обработали пропуски в году выпуска (т.к. там их было менее 2% - удалили), после чего мы смогли привести данные столбца year к нужному нам типу и в дальнейшем - строить графики по распределению по годам, и разобрались со значениями "tbd" в колонке с оценками пользователей. Также добавим колонку с общими продажами.
+
+После создания колонки с общими продажами по всему миру у нас появляются различные возможности по созданию графиков, зависимостей и схем, например, мы можем посчитать, какая самая продаваемая игра за все представленное время по всему миру.
+
+
+# Шаг 3. Проведите исследовательский анализ данных
+
+   - Посмотрите, сколько игр выпускалось в разные годы. Важны ли данные за все периоды?
+   - Посмотрите, как менялись продажи по платформам. Выберите платформы с наибольшими суммарными продажами и постройте распределение по годам. За какой характерный срок появляются новые и исчезают старые платформы?
+   - Возьмите данные за соответствующий актуальный период. Актуальный период определите самостоятельно в результате исследования предыдущих вопросов. Основной фактор — эти данные помогут построить прогноз на 2017 год.
+   - Не учитывайте в работе данные за предыдущие годы.
+   - Какие платформы лидируют по продажам, растут или падают? Выберите несколько потенциально прибыльных платформ.
+   - Постройте график «ящик с усами» по глобальным продажам игр в разбивке по платформам. Опишите результат.
+   - Посмотрите, как влияют на продажи внутри одной популярной платформы отзывы пользователей и критиков. Постройте диаграмму рассеяния и посчитайте корреляцию между отзывами и продажами. Сформулируйте выводы.
+   - Соотнесите выводы с продажами игр на других платформах.
+   - Посмотрите на общее распределение игр по жанрам. Что можно сказать о самых прибыльных жанрах? Выделяются ли жанры с высокими и низкими продажами?
+
+Исходя из данных таблицы и графика видно, что с 1994 количество игр стало увеличиваться, и пик приходится на 2007-2011. Также интересно, что произошло в 2002 году - показатели для того времени можно назвать локальным пиком. До 1994 года количество выпущенных игр достаточно мало, так что думаю, эти показатели нас не интересуют. Давайте посмотрим, какие платформы - самые популярные среди игроков. По таблице видно, что 6 самых популярных платформ - PS2,X360, PS3, Wii, DS, PS. Также я построила общую сводную страницу, и тут показана динамика развития различных платформ за разные периоды времени. Самая устойчивая платформа - PC - персональные компьютеры - у нее самые стабильные показатели и при том, она до сих пор имеет определенную популярность, хоть и небольшую, однако все равно остается на плаву.
+
+На матрице рассеивания видно, что:
+
+   - игры с низкими оценками пользователей чаще всего не получают широкого распространения, и чем выше оценка - тем больше продаж. Однако достаточно много "выстреливающих" игр, которые не смотря на среднюю (и даже низкую для своего ценового класса) стоимость - имеют высокий объем продаж
+
+   - игры с низкими оценками критиков практически вообще не получают широкого распространения и надежды на поднятие стоимости.
+
+   - больше всего игр набирают средне-высокую (7-8 баллов из 10) оценку пользователей, и такую же оценку критиков (70-80 баллов из 100)
+
+Бесспорный лидер и по количеству выпускаемых игр, и по объему продаж - игры жанра "экшен".
+
+Не смотря на то, что шутеров практически в половину меньше чем спортивных игр, они приносят на четверть меньше общей прибыли, чем шутеры (на 3 месте по продажам).
+
+Также неплохо себя показали "платформенники", которые при небольшом количестве выпущенных игр - меньше 1000 - приносят доход, сопоставимый с шутерами.
+
+Также, не смотря на то, что игр жанра "misc" выпускается достаточно много, они приносят средний доход - возможно даже низкий для количества игр этого жанра.
+
+Жанры с низкими (относительно остальных) продажами - драки, симуляции, головоломки, приключенческие и стратегии.
+
+## Промежуточный вывод:
+
+За последний год мы наблюдаем тенденцию к тому, что общее число покупок снижается, поэтому крайне важно непрогадать с выбором игры, а если получится - набрать пару вариантов в запас. Самый ходовой жанр - экшен-игры, за ним идет шутеры и симуляторы спорта.
+
+## Влияет ли рейтинг ESRB на продажи в отдельном регионе?
+
+Исходя из тех данных, что у нас есть - наиболее часто продаваемые игры - жанра M (для взрослых). Далее - игры для всех возврастов (Е), игры для тинейджеров 13+ (Т) и игры для всех от 10 лет (Е10+).
+
+Смотря на эти диаграммы, сделать вывод можно, но сложно - очень много пропусков в данных(они вторые по проценту среди всех групп рейтинга). Однако, среди того, что есть - во всех регионах, кроме Японии - преобладает рейтинг M - жанры для взрослых. В Японии - Т - подросткам от 13 лет.
+
+## Промежуточный вывод:
+
+Среди всех направлений света, в топ-5 жанров игр 100% входят игры жанра экшен и шутеры. Это два самых основных жанра, которые встречаются везде. Далее по частоте - role-playing, misc, sports.
+
+Япония сильнее всего отличается от всего остального мира. (или правильней сказать что весь мир очень похож друг на друга, кроме Японии). Но в любом случае, наблюдается тенденция к уменьшению покупок игр.
+
+# Шаг 5. Проверьте гипотезы
+
+Задайте самостоятельно пороговое значение alpha. Поясните: Как вы сформулировали нулевую и альтернативную гипотезы; Какой критерий применили для проверки гипотез и почему.
+
+### Средние пользовательские рейтинги платформ Xbox One и PC одинаковые;
+
+В данном случае, нулевая гипотеза - *средние пользовательские оценки платформ XOne и PC - одинаковые. Альтернативная гипотеза - то, что они неодинаковы*.
+
+```
+sample1 = df[df['platform']=='XOne']['user_score'].notna() # задаем первый датафрейм
+sample2 = df[df['platform']=='PC']['user_score'].notna() # второй
+
+results = st.ttest_ind(sample1,sample2)
+
+print('полученное p-value:', results.pvalue)
+
+alpha = 0.05 # определяем пороговое значение
+
+if results.pvalue < alpha:
+    print('Отвергаем гипотезу Н_0')
+else:
+    print('Не получилось отвергнуть нулевую гипотезу')
+```
+```
+полученное p-value: 0.03981358558167057
+Отвергаем гипотезу Н_0
+```
+Это означает, что из всей выборки вероятность встретить результат, когда они равны составляет 3.23...%. И получается, гипотеза отвергает возможность того, что оценки равны. Нулевую гипотезу мы отвергаем в пользу альтернативной.
+
+### Средние пользовательские рейтинги жанров Action (англ. «действие», экшен-игры) и Sports (англ. «спортивные соревнования») разные.
+```
+sample1 = df[df['genre']=='Action']['user_score'].notna()
+sample2 = df[df['genre']=='Sports']['user_score'].notna()
+results = st.ttest_ind(sample1,sample2)
+
+print('полученное p-value:', results.pvalue)
+
+alpha = 0.05
+
+if results.pvalue < alpha:
+    print('Отвергаем гипотезу Н_0')
+else:
+    print('Не получилось отвергнуть нулевую гипотезу')
+```
+```
+полученное p-value: 2.8887406123185774e-10
+Отвергаем гипотезу Н_0
+```
+Здесь же нулевая гипотеза звучит следующим образом: средние пользовательские рейтинги двух разных жанров разные. Альтернативная: *средние пользовательские рейтинги одинаковые. И полученное pvalue нам говорит о том, что среди этих датафремов с вероятностью 3.9004 10^(-10)% мы встретим разные средние рейтинги.
+
+# Шаг 6. Напишите общий вывод
+
+В начале работы мы ставили целью выявить определяющие успешность игры закономерности. Это позволит сделать ставку на потенциально популярный продукт и спланировать рекламные кампании.
+
+Проведя анализ исходных данных, подготовив их для исследования,приведя колонки к snake_case, заполнив возможные пропуски и убрав выбивающиеся значения, мы изучили вопрос с разных сторон и сделали вывод, что успешность игры определяется популярностью платформы и жанра в том или ином регионе.
+
+Для разных регионов:
+
+  -  Америка: PS4, Action
+  -  Европа: PS4, Action
+  -  Япония: 3DS, Role-Playing
+  -  Другие страны: PS4, Action
+
+Исходя из этого делаем вывод, что преобладающая платформа и жанр - PS4, Action - следовательно, вероятность "выстрелить" именно такой игры - гораздо выше. Однако ставить все только на одну игру - нецелесообразно. Я бы предложила в качестве платформ также рассматривать XOne и 3DS (если направлены на Японский рынок) и несколько жанров - Shooter, Role-Playing и Misc.
+
+Также, можно заметить, что оценка критиков бОльше влияет на распространение и спрос на игру (чем оценка игроков), соответственно, этот фактор тоже стоит учитывать при планировании рекламной компании.
+
+Также мы проверили 2 гипотезы и пришли к выводу, что:
+
+   - средние пользовательские рейтинги платформ Xbox One и PC имеют сильные различия
+   - cредние пользовательские рейтинги жанров Action и Sports схожи
+
+
